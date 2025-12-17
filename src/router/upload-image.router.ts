@@ -5,8 +5,13 @@ import { uploadImageMiddleware } from '../middleware/upload-image.middleware';
 
 const router = express.Router();
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-router.post('', uploadImageMiddleware.single('file'), UploadImageController);
+router.post(
+  '',
+  uploadImageMiddleware.single('file') as any,
+  (request, response, next) => {
+    UploadImageController(request, response, next).catch(next);
+  },
+);
 
 // eslint-disable-next-line import/no-default-export
 export default router;

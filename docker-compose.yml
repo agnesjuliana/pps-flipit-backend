@@ -13,7 +13,7 @@ services:
     expose:
       - ${DATABASE_PORT}
     volumes:
-      - ./docker/volumes/:/var/lib/postgresql/data
+      - ./docker/volumes/:/var/lib/postgresql
   redis:
     container_name: redis-flipit
     image: redis:latest

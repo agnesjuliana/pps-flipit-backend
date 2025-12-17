@@ -13,7 +13,7 @@ import { createFlashcardValidation } from '../validators';
 
 router.post(
   '/generate',
-  uploadFileMiddleware.single('file'),
+  uploadFileMiddleware.single('file') as any,
   FlashcardController.generateFlashcard,
 );
 router.post(
