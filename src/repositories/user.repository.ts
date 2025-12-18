@@ -8,7 +8,6 @@ export const Users = {
     email: string,
     password: string,
     name: string,
-    dateOfBirth: Date,
     educationLevel: string,
   ) {
     const educationLevelEnum: EducationLevel = educationLevel as EducationLevel;
@@ -18,7 +17,6 @@ export const Users = {
         role: 'USER',
         email,
         password,
-        dateOfBirth,
         educationLevel: educationLevelEnum,
       },
     });

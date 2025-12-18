@@ -20,13 +20,10 @@ export const AuthService = {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword: string = await bcrypt.hash(request.password, salt);
 
-      const parsedDateOfBirth = new Date(request.dateOfBirth);
-
       const user = await Users.createUser(
         request.email,
         hashedPassword,
         request.name,
-        parsedDateOfBirth,
         request.educationLevel,
       );
 
@@ -35,7 +32,6 @@ export const AuthService = {
         nama: user.name,
         email: user.email,
         role: user.role,
-        dateOfBirth: user.dateOfBirth,
         educationLevel: user.educationLevel,
       };
 
@@ -72,7 +68,6 @@ export const AuthService = {
       nama: user.name,
       email: user.email,
       role: user.role,
-      dateOfBirth: user.dateOfBirth,
       educationLevel: user.educationLevel,
     };
   },
@@ -91,7 +86,6 @@ export const AuthService = {
         nama: selfAccount.name,
         email: selfAccount.email,
         role: selfAccount.role,
-        dateOfBirth: selfAccount.dateOfBirth,
         educationLevel: selfAccount.educationLevel,
       };
 

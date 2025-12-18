@@ -3,6 +3,5 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
-  dateOfBirth: string;
   educationLevel: string;
 }
