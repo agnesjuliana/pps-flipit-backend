@@ -11,13 +11,11 @@ model User {
   id              Int      @id @default(autoincrement()) @db.Integer
   name            String
   role            Role
-  dateOfBirth     DateTime @db.Date
   educationLevel  EducationLevel
   email           String   @unique
   password        String
-  flashcards      Flashcard[]
   streaks         Streak[]
-  folders         Folder[]
+  quizAttempts    QuizAttempt[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -28,75 +26,19 @@ model Streak {
   startDate DateTime @db.Date
   endDate   DateTime? @db.Date
   user      User     @relation(fields: [userId], references: [id])
-  plays     Play[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Flashcard {
-  id          Int      @id @default(autoincrement()) @db.Integer
-  folderId    Int
-  userId      Int
-  title       String
-  description String
-  pathFile    String?
-  sourceId    String?
-  user        User     @relation(fields: [userId], references: [id])
-  folder      Folder   @relation(fields: [folderId], references: [id])
-  flashcardItems FlashcardItem[]
-  plays       Play[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model FlashcardItem {
-  id            Int      @id @default(autoincrement()) @db.Integer
-  flashcardId   Int
-  question      String
-  answer        String
-  imageQuestion String?
-  imageAnswer   String?
-  flashcard     Flashcard @relation(fields: [flashcardId], references: [id])
-  playResults   PlayResult[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model Play {
-  id          Int      @id @default(autoincrement()) @db.Integer
-  flashcardId Int
-  datePlay    DateTime @db.Date
-  streakId    Int
-  wrong       Int?     @default(0)
-  right       Int?     @default(0)
-  flashcard   Flashcard @relation(fields: [flashcardId], references: [id])
-  streak      Streak    @relation(fields: [streakId], references: [id])
-  playResults PlayResult[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model PlayResult {
-  id            Int      @id @default(autoincrement()) @db.Integer
-  flashcardItemId Int
-  playId        Int
-  isTrue        Boolean  @default(false)
-  flashcardItem FlashcardItem @relation(fields: [flashcardItemId], references: [id])
-  play          Play          @relation(fields: [playId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  @@unique([flashcardItemId, playId])
-}
-
-model Folder {
-  id          Int        @id @default(autoincrement()) @db.Integer
-  title       String
-  description String
-  flashcards  Flashcard[]
-  user        User       @relation(fields: [userId], references: [id])
-  userId      Int       
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+model QuizAttempt {
+  id               Int      @id @default(autoincrement()) @db.Integer
+  userId           Int
+  totalQuestions   Int
+  correctAnswers   Int
+  date             DateTime @db.Date
+  user             User     @relation(fields: [userId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 enum Role {

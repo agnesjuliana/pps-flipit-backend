@@ -14,7 +14,6 @@ async function users() {
       password: bcryptjs.hashSync(user.password, salt),
       role: user.role as Role,
       name: user.name,
-      dateOfBirth: new Date('2000-01-01'),
       educationLevel: EducationLevel.Undergraduate,
     };
   });
@@ -29,7 +28,6 @@ async function users() {
         password: user.password,
         role: user.role,
         name: user.name,
-        dateOfBirth: user.dateOfBirth,
         educationLevel: user.educationLevel,
       },
       create: {
@@ -37,7 +35,6 @@ async function users() {
         password: user.password,
         role: user.role,
         name: user.name,
-        dateOfBirth: user.dateOfBirth,
         educationLevel: user.educationLevel,
       },
     });
