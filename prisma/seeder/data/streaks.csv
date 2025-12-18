@@ -1,0 +1,4 @@
+email,startDate,endDate,longestStreak
+admin@gmail.com,2025-11-01,2025-11-15,15
+user@gmail.com,2025-12-10,,7
+user2@gmail.com,2025-12-14,2025-12-18,4

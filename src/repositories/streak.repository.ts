@@ -8,6 +8,7 @@ export const Streaks = {
         userId,
         startDate,
         endDate: startDate,
+        longestStreak: 1,
       },
     });
   },
@@ -35,12 +36,44 @@ export const Streaks = {
   },
 
   async updateStreak(streakId: number, endDate: Date) {
+    // Calculate streak count
+    const streak = await prisma.streak.findUnique({
+      where: {
+        id: streakId,
+      },
+    });
+
+    if (!streak) {
+      throw new Error('Streak not found');
+    }
+
+    const streakCount =
+      Math.floor(
+        (new Date(endDate).getTime() - new Date(streak.startDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) + 1;
+
     return await prisma.streak.update({
       where: {
         id: streakId,
       },
       data: {
         endDate,
+        longestStreak:
+          streakCount > streak.longestStreak
+            ? streakCount
+            : streak.longestStreak,
+      },
+    });
+  },
+
+  async updateLongestStreak(streakId: number, longestStreak: number) {
+    return await prisma.streak.update({
+      where: {
+        id: streakId,
+      },
+      data: {
+        longestStreak,
       },
     });
   },

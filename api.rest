@@ -17,17 +17,54 @@ Content-Type: application/json
     "email": "lagi@gmail.com",
     "password": "string",
     "name": "string",
-    "category": "COLLEGE",
-    "education_level": "S1",
-    "institution": "string",
-    "no_telp": "00008888"
+    "educationLevel": "Undergraduate"
 }
 
+### GET
+// Get current user profile (requires auth)
+GET http://localhost:3000/auth/me
+Authorization: Bearer <token>
+
+### GET
+// Get top 50 streaks leaderboard
+GET http://localhost:3000/leaderboard/top
+Content-Type: application/json
+
+### GET
+// Get top 20 streaks leaderboard
+GET http://localhost:3000/leaderboard/top?limit=20
+Content-Type: application/json
+
+### GET
+// Get user's rank and personal streak data (requires auth)
+GET http://localhost:3000/leaderboard/user-rank
+Authorization: Bearer <token>
+Content-Type: application/json
+
+### GET
+// Get top streaks by education level
+GET http://localhost:3000/leaderboard/by-education?educationLevel=Undergraduate&limit=50
+Content-Type: application/json
+
 ### POST
-// Send verification email
-POST http://localhost:3000/mailer/verify-email
+// Submit quiz result and update streak
+POST http://localhost:3000/quiz/submit
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "email": "mnynoname14@gmail.com"
+    "totalQuestions": 10,
+    "correctAnswers": 8
 }
+
+### GET
+// Get current user's weekly quiz statistics
+GET http://localhost:3000/quiz/weekly
+Authorization: Bearer <token>
+Content-Type: application/json
+
+### GET
+// Get current user's monthly quiz statistics
+GET http://localhost:3000/quiz/monthly
+Authorization: Bearer <token>
+Content-Type: application/json

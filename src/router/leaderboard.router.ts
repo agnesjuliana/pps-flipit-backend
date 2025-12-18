@@ -1,28 +1,28 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 /* eslint-disable import/no-default-export */
-/* eslint-disable @typescript-eslint/unbound-method */
 import express from 'express';
 
-const router = express.Router();
-
-import { StreakController } from '../controllers';
+import { LeaderboardController } from '../controllers';
 import { isAllowedRoles } from '../middleware';
 import passport from '../strategy/jwt-strategy';
 
+const router = express.Router();
+
+router.get('/top', LeaderboardController.getTopStreaks);
+
 router.get(
-  '/current',
+  '/user-rank',
   passport.authenticate('jwt', { session: false }),
   isAllowedRoles(['ADMIN', 'USER']) as express.RequestHandler,
-  StreakController.getCurrentStreak,
+  LeaderboardController.getUserRank,
 );
 
 router.get(
-  '/all',
+  '/by-education',
   passport.authenticate('jwt', { session: false }),
-  isAllowedRoles(['ADMIN']) as express.RequestHandler,
-  StreakController.getAllStreaks,
+  isAllowedRoles(['ADMIN', 'USER']) as express.RequestHandler,
+  LeaderboardController.getTopStreaksByEducationLevel,
 );
-/* eslint-enable @typescript-eslint/unbound-method */
-/* eslint-enable @typescript-eslint/no-misused-promises */
 
 export default router;

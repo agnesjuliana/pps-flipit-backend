@@ -24,6 +24,7 @@ CREATE TABLE "Streak" (
     "userId" INTEGER NOT NULL,
     "startDate" DATE NOT NULL,
     "endDate" DATE,
+    "longestStreak" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
