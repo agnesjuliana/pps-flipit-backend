@@ -11,7 +11,7 @@ export const QuizAttemptService = {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Create quiz attempt
+      // 1. Create quiz attempt
       const quizAttempt = await QuizAttempts.createQuizAttempt(
         userId,
         totalQuestions,
@@ -19,7 +19,7 @@ export const QuizAttemptService = {
         today,
       );
 
-      // Update or create streak
+      // 2. Update or create streak record
       await this.updateStreak(userId, today);
 
       return quizAttempt;
@@ -32,29 +32,22 @@ export const QuizAttemptService = {
     try {
       const streak = await Streaks.findStreakByUserId(userId);
 
+      // If no streak exists, start the very first one
       if (!streak) {
-        // Create new streak
         await Streaks.createStreak(userId, today);
         return;
       }
 
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(0, 0, 0, 0);
+      const lastActive = new Date(streak.endDate || streak.startDate);
+      lastActive.setHours(0, 0, 0, 0);
 
-      // Check if user had a quiz yesterday
-      const yesterdayAttempts = await QuizAttempts.findQuizAttemptsByDate(
-        userId,
-        yesterday,
+      const diffDays = Math.floor(
+        (today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24),
       );
 
-      if (yesterdayAttempts.length > 0) {
-        // Streak continues - update endDate to today
-        await Streaks.updateStreak(streak.id, today);
-      } else if (
-        new Date(streak.endDate).toDateString() !== today.toDateString()
-      ) {
-        // Streak broken - create new streak
+      if (diffDays === 1) {
+        await Streaks.updateStreak(streak.id, { endDate: today });
+      } else if (diffDays >= 2) {
         await Streaks.createStreak(userId, today);
       }
     } catch (error) {
@@ -76,7 +69,6 @@ export const QuizAttemptService = {
         today,
       );
 
-      // Map to days of week
       const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const weekData = weekDays.map(day => ({
         day,
@@ -90,14 +82,30 @@ export const QuizAttemptService = {
         weekData[dayIndex].correctAnswers += attempt.correctAnswers;
       }
 
+      // Check for most recent streak to display current count
       const currentStreak = await Streaks.findStreakByUserId(userId);
-      const streakCount = currentStreak
-        ? Math.floor(
-            (new Date(currentStreak.endDate).getTime() -
-              new Date(currentStreak.startDate).getTime()) /
-              (1000 * 60 * 60 * 24),
-          ) + 1
-        : 0;
+      let streakCount = 0;
+
+      if (currentStreak) {
+        const lastActive = new Date(
+          currentStreak.endDate || currentStreak.startDate,
+        );
+        lastActive.setHours(0, 0, 0, 0);
+
+        const diff = Math.floor(
+          (today.getTime() - lastActive.getTime()) / (1000 * 60 * 60 * 24),
+        );
+
+        // Only show the count if the streak isn't broken (today or yesterday)
+        if (diff <= 1) {
+          streakCount =
+            Math.floor(
+              (new Date(currentStreak.endDate).getTime() -
+                new Date(currentStreak.startDate).getTime()) /
+                (1000 * 60 * 60 * 24),
+            ) + 1;
+        }
+      }
 
       return {
         streakCount,
