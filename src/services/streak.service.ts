@@ -1,83 +1,53 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-import { Streaks, Plays, Flashcards } from '../repositories';
-import {
-  mapDatesToWeekDays,
-  mapDatesToMonthDays,
-  type IWeekDaysMap,
-  type IDaysMap,
-  weekDays,
-  days,
-} from '../utils/DateNow';
+import { Streaks } from '../repositories';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const StreakService = {
-  async getWeeklyStreaks(userId: number) {
+  async getCurrentStreak(userId: number) {
     try {
-      const flashcardTotal = await Flashcards.countFlashcardByUserId(userId);
-
       const streak = await Streaks.findStreakByUserId(userId);
 
       if (!streak) {
-        console.log('streak not found');
         return {
-          streakTotal: 0,
-          flashcardTotal,
-          streakWeek: weekDays,
+          streakCount: 0,
+          startDate: null,
+          endDate: null,
         };
       }
 
-      const streakTotal = await Plays.countStreakByStreakId(streak.id);
+      const streakCount =
+        Math.floor(
+          (new Date(streak.endDate).getTime() -
+            new Date(streak.startDate).getTime()) /
+            (1000 * 60 * 60 * 24),
+        ) + 1;
 
-      const playStreakAWeek = await Plays.findPlayWithinWeekByStreakId(
-        streak.id,
-      );
-
-      const streakWeek = mapDatesToWeekDays(playStreakAWeek);
-
-      const streakWeeklyStatistic = {
-        streakTotal,
-        flashcardTotal,
-        streakWeek,
+      return {
+        streakCount,
+        startDate: streak.startDate,
+        endDate: streak.endDate,
       };
-      return streakWeeklyStatistic;
     } catch (error) {
       throw error;
     }
   },
 
-  async getMonthlyStreaks(userId: number) {
+  async getAllStreaks(userId: number) {
     try {
-      const flashcardTotal = await Flashcards.countFlashcardByUserId(userId);
+      const streaks = await Streaks.findAllStreaksByUserId(userId);
 
-      const streak = await Streaks.findStreakByUserId(userId);
+      const formattedStreaks = streaks.map(streak => ({
+        id: streak.id,
+        streakCount:
+          Math.floor(
+            (new Date(streak.endDate).getTime() -
+              new Date(streak.startDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ) + 1,
+        startDate: streak.startDate,
+        endDate: streak.endDate,
+      }));
 
-      if (!streak) {
-        return {
-          streakTotal: 0,
-          todayPlayTotal: 0,
-          flashcardTotal,
-          streakMonth: days,
-        };
-      }
-
-      const streakTotal = await Plays.countStreakByStreakId(streak.id);
-
-      const todayPlayTotal = await Plays.countPlayTodayByUserId(userId);
-
-      const playStreakAMonth = await Plays.findPlayWithinMonthByStreakId(
-        streak.id,
-      );
-
-      const streakMonth = mapDatesToMonthDays(playStreakAMonth);
-
-      const streakMonthlyStatistic = {
-        streakTotal,
-        todayPlayTotal,
-        flashcardTotal,
-        streakMonth,
-      };
-      return streakMonthlyStatistic;
+      return formattedStreaks;
     } catch (error) {
       throw error;
     }

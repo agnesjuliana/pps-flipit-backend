@@ -6,7 +6,7 @@ import { StreakService } from '../services';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const StreakController = {
-  async getWeeklyStreaks(
+  async getCurrentStreak(
     request: Request,
     response: Response,
     next: NextFunction,
@@ -16,11 +16,21 @@ export const StreakController = {
       const userId = requestData.user?.id
         ? Number.parseInt(requestData.user.id)
         : null;
-      const result = await StreakService.getWeeklyStreaks(userId);
+
+      if (!userId) {
+        const error = new CustomResponse(
+          StatusCodes.UNAUTHORIZED,
+          'Unauthorized',
+          null,
+        );
+        return response.status(StatusCodes.UNAUTHORIZED).json(error.toJSON());
+      }
+
+      const result = await StreakService.getCurrentStreak(userId);
 
       const success = new CustomResponse(
         StatusCodes.OK,
-        'Weekly streaks',
+        'Current streak',
         result,
       );
 
@@ -30,7 +40,7 @@ export const StreakController = {
     }
   },
 
-  async getMonthlyStreaks(
+  async getAllStreaks(
     request: Request,
     response: Response,
     next: NextFunction,
@@ -40,13 +50,19 @@ export const StreakController = {
       const userId = requestData.user?.id
         ? Number.parseInt(requestData.user.id)
         : null;
-      const result = await StreakService.getMonthlyStreaks(userId);
 
-      const success = new CustomResponse(
-        StatusCodes.OK,
-        'Monthly streaks',
-        result,
-      );
+      if (!userId) {
+        const error = new CustomResponse(
+          StatusCodes.UNAUTHORIZED,
+          'Unauthorized',
+          null,
+        );
+        return response.status(StatusCodes.UNAUTHORIZED).json(error.toJSON());
+      }
+
+      const result = await StreakService.getAllStreaks(userId);
+
+      const success = new CustomResponse(StatusCodes.OK, 'All streaks', result);
 
       return response.json(success.toJSON());
     } catch (error) {

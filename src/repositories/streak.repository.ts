@@ -2,8 +2,8 @@ import prisma from '../config/prisma';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const Streaks = {
-  async createStreak(userId: number, startDate: Date, prismaClient: any) {
-    return await prismaClient.streak.create({
+  async createStreak(userId: number, startDate: Date) {
+    return await prisma.streak.create({
       data: {
         userId,
         startDate,
@@ -17,11 +17,25 @@ export const Streaks = {
       where: {
         userId,
       },
+      orderBy: {
+        startDate: 'desc',
+      },
     });
   },
 
-  async updateStreak(streakId: number, endDate: Date, prismaClient: any) {
-    return await prismaClient.streak.update({
+  async findAllStreaksByUserId(userId: number) {
+    return await prisma.streak.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        startDate: 'desc',
+      },
+    });
+  },
+
+  async updateStreak(streakId: number, endDate: Date) {
+    return await prisma.streak.update({
       where: {
         id: streakId,
       },
