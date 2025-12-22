@@ -29,4 +29,17 @@ export const Users = {
       },
     });
   },
+
+  async updateUserByEmail(
+    email: string,
+    data: { name?: string; educationLevel?: any },
+  ) {
+    return prisma.user.update({
+      where: { email: email },
+      data: {
+        name: data.name,
+        educationLevel: data.educationLevel,
+      },
+    });
+  },
 };

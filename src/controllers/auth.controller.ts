@@ -2,7 +2,11 @@ import { type NextFunction, type Request, type Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError, CustomResponse } from '../middleware';
-import { type LoginRequest, type RegisterRequest } from '../models';
+import {
+  type LoginRequest,
+  type RegisterRequest,
+  type UpdateProfileRequest,
+} from '../models';
 import { AuthService } from '../services';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -55,6 +59,44 @@ export const AuthController = {
         StatusCodes.OK,
         'Success get Me',
         userData,
+      );
+
+      return response.status(StatusCodes.OK).json(result.toJSON());
+    } catch (error: any) {
+      return next(error);
+    }
+  },
+
+  async updateProfile(
+    request: Request,
+    response: Response,
+    next: NextFunction,
+  ) {
+    try {
+      // 1. Ambil Token (Sama seperti method 'me')
+      const requestToken: string | undefined = request.headers['authorization'];
+
+      if (!requestToken) {
+        throw new CustomError(StatusCodes.UNAUTHORIZED, 'token required');
+      }
+
+      const tokenParts = requestToken.split(' ');
+
+      if (!tokenParts[1]) {
+        throw new CustomError(StatusCodes.UNAUTHORIZED, 'token required');
+      }
+
+      const token = tokenParts[1];
+
+      const updatedData = await AuthService.updateProfile(
+        token,
+        request.body as UpdateProfileRequest,
+      );
+
+      const result = new CustomResponse(
+        StatusCodes.OK,
+        'Profile updated successfully',
+        updatedData,
       );
 
       return response.status(StatusCodes.OK).json(result.toJSON());

@@ -19,4 +19,11 @@ router.get(
   AuthController.me,
 );
 
+router.put(
+  '/profile',
+  passport.authenticate('jwt', { session: false }),
+  isAllowedRoles(['ADMIN', 'USER']) as express.RequestHandler,
+  AuthController.updateProfile,
+);
+
 export default router;
