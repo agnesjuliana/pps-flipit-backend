@@ -3,7 +3,11 @@ import bcrypt from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 
 import { CustomError } from '../middleware';
-import { type LoginRequest, type RegisterRequest } from '../models';
+import {
+  type LoginRequest,
+  type RegisterRequest,
+  type UpdateProfileRequest,
+} from '../models';
 import { Users } from '../repositories';
 import { generateAccessToken, tokenDecode } from '../utils/JwtToken';
 
@@ -91,6 +95,38 @@ export const AuthService = {
 
       return result;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  async updateProfile(token: string, payload: UpdateProfileRequest) {
+    try {
+      // 1. Ambil email dari token
+      const tokenData = tokenDecode(token);
+
+      // Validasi kecil: pastikan email ada di token
+      if (!tokenData || !tokenData.email) {
+        throw new CustomError(StatusCodes.UNAUTHORIZED, 'Invalid token data');
+      }
+
+      const updatedUser = await Users.updateUserByEmail(tokenData.email, {
+        name: payload.name,
+        educationLevel: payload.educationLevel,
+      });
+
+      // 3. Return data terbaru
+      return {
+        user_id: updatedUser.id,
+        nama: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        educationLevel: updatedUser.educationLevel,
+      };
+    } catch (error: any) {
+      // Handle jika user entah kenapa tidak ditemukan di DB saat update
+      if (error.code === 'P2025') {
+        throw new CustomError(StatusCodes.NOT_FOUND, 'User account not found');
+      }
       throw error;
     }
   },
